@@ -1,0 +1,95 @@
+<project name="test" basedir="." default="test3">
+	
+	<taskdef resource="com/reanimation/ant/antlib.xml">
+	  <classpath>
+	    <pathelement location="target/vmware-ant-tasks-1.0-SNAPSHOT.jar"/>
+        <pathelement location="c:/Users/Garth/.m2/repository/vijava/vijava/55b20130927/vijava-55b20130927.jar"/>
+        <pathelement location="c:/Users/Garth/.m2/repository/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar"/>
+	  </classpath>
+	</taskdef>	
+	
+	<property name="vcenter.host" value="192.168.48.142"/>
+	<property name="vcenter.user" value="Administrator"/>
+    <property name="vcenter.password" value="omicron"/>
+	<property name="vm.ip" value="192.168.48.145"/>
+	<property name="clone.name" value="test-clone"/>
+	
+    <target name="main">
+    	
+        <findvm 
+            host = "${vcenter.host}"
+            user = "${vcenter.user}"
+            password = "${vcenter.password}"
+            ip="${vm.ip}"
+            nameproperty="vm.name"
+            pathproperty="vm.path"
+            morproperty="vm.id"/>
+        
+        <echo message="Found VM Path=${vm.path} Name=${vm.name} MOR=${vm.id}"/>
+        
+        <startvm
+            host = "${vcenter.host}"
+            user = "${vcenter.user}"
+            password = "${vcenter.password}"
+            mor="${vm.id}"/>
+    </target>
+	
+	<target name="test2">
+    	
+        <vsphere 
+            host = "${vcenter.host}"
+            user = "${vcenter.user}"
+            password = "${vcenter.password}">
+        	
+            <findvm 
+                ip="${vm.ip}"
+                nameProperty="vm.name"
+                pathProperty="vm.path"
+                morProperty="vm.id"/>
+        	
+            <echo message="Found VM Name=${vm.name} MOR=${vm.id} Path=${vm.path} "/>
+        	
+        	<stopvm
+        	   mor="${vm.id}"/>
+        	
+            <clonevm
+                mor = "${vm.id}"
+                targetName = "${clone.name}"
+            	targetVmIdProperty = "clone.id"
+                powerOn = "false">
+            </clonevm>
+        	
+            <startvm
+                mor="${vm.id}"
+                ipProperty="vm.ip"/>
+        	
+            <echo message="Started VM with IP ${vm.ip}"/>
+        	
+        	<destroyvm mor="${clone.id}"/>
+        	
+        	<configurevm mor="${vm.id}"/>
+        	
+    	</vsphere>
+    	
+    	
+    </target>
+	
+    <target name="test3">
+        
+        <vsphere 
+            host = "${vcenter.host}"
+            user = "${vcenter.user}"
+            password = "${vcenter.password}">
+            
+            <findvm 
+                ip="${vm.ip}"
+                nameProperty="vm.name"
+                pathProperty="vm.path"
+                morProperty="vm.id"/>
+            
+            <configurevm mor="${vm.id}"/>
+        </vsphere>
+    </target>
+	
+
+</project>

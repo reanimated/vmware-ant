@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<antlib>
+    <taskdef name="vsphere" classname="com.reanimation.ant.vmware.VSphereTask"/>
+    <taskdef name="configurevm" classname="com.reanimation.ant.vmware.ReconfigureVM"/>
+    <taskdef name="findvm" classname="com.reanimation.ant.vmware.FindVM"/>
+    <taskdef name="startvm" classname="com.reanimation.ant.vmware.StartVM"/>
+    <taskdef name="stopvm" classname="com.reanimation.ant.vmware.StopVM"/>
+    <taskdef name="clonevm" classname="com.reanimation.ant.vmware.CloneVM"/>
+    <taskdef name="destroyvm" classname="com.reanimation.ant.vmware.DestroyVM"/>
+</antlib>
