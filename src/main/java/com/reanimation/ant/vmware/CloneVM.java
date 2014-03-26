@@ -101,6 +101,7 @@ public class CloneVM extends VMTask {
 		
 		try {
 			VirtualMachine sourceVM = findVM();
+			
 			if (targetName == null)
 				throw new BuildException("target name MUST be specified");
 			
@@ -133,6 +134,7 @@ public class CloneVM extends VMTask {
 			}
 			clone.setConfig(config.spec);
 
+			log("Cloning VM " + toString(sourceVM) + "...");
 			com.vmware.vim25.mo.Task task = sourceVM.cloneVM_Task(targetFolder, targetName, clone);
 			String status = task.waitForTask();
 			if (status != com.vmware.vim25.mo.Task.SUCCESS)
