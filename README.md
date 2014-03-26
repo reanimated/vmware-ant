@@ -77,7 +77,7 @@ You could also place these three jars in your installed Ant's lib directory.
   
 You can use the tasks in one of two ways:
   
-  1. Use the [vSphere](wiki/vSphere) task to connect to vSphere and place the other tasks as nested  
+  1. Use the [vSphere](../../wiki/vSphere) task to connect to vSphere and place the other tasks as nested  
      children within this task. This is what is shown in the example at the top of this page. You can  
      also intermix any other Ant tasks within a vSphere task. 
   2. Do not use the vSphere task and instead use the remaining tasks "standalone." In this case you  
@@ -98,10 +98,10 @@ You can use the tasks in one of two ways:
 
 | Task       | Description
 |:-----------|:-----------                                   
-|[vSphere](wiki/vSphere)     | A container task that makes a connection to a vSphere server and shares it with nested tasks
-|[FindVM](wiki/FindVM)      | Located an existing virtual machine
-|[StartVM](wiki/StartVM)     | Start a virtual machine
-|[StopVM](wiki/StopVM)      | Stop a virtual machine
-|[DestroyVM](wiki/DestroyVM)   | Delete a virtual machine
-|[CloneVM](wiki/CloneVM)     | Clone a virtual machine
-|[ConfigureVM](wiki/ConfigureVM) |  Reconfigure a virtual machine
+|[vSphere](../../wiki/vSphere)     | A container task that makes a connection to a vSphere server and shares it with nested tasks
+|[FindVM](../../wiki/FindVM)      | Located an existing virtual machine
+|[StartVM](../../wiki/StartVM)     | Start a virtual machine
+|[StopVM](../../wiki/StopVM)      | Stop a virtual machine
+|[DestroyVM](../../wiki/DestroyVM)   | Delete a virtual machine
+|[CloneVM](../../wiki/CloneVM)     | Clone a virtual machine
+|[ConfigureVM](../../wiki/ConfigureVM) |  Reconfigure a virtual machine
