@@ -141,7 +141,7 @@ public abstract class VMTask extends VSphereTask {
 				VirtualMachine selectedVm = null;
 				for (VirtualMachine vm : foundVms) {
 					VirtualMachinePowerState powerState = vm.getRuntime().getPowerState();
-					trace("FOUND " + vm.getMOR().getVal() + " " + vm.getName() + " " + powerState);
+					//trace("FOUND " + vm.getMOR().getVal() + " " + vm.getName() + " " + powerState);
 					if (powerState  == VirtualMachinePowerState.poweredOn) {
 						if (selectedVm != null) {
 							throw new BuildException("Multiple running VMs match the server IP address!");
