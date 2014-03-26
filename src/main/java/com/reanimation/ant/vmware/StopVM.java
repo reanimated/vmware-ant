@@ -9,7 +9,12 @@ import org.apache.tools.ant.BuildException;
 public class StopVM extends VMTask {
 	@Override
 	public void execute () throws BuildException {
-		connect();
-		stopVM(findVM());
+		if (!connect())
+			return;
+		try {
+			stopVM(findVM());
+		} catch (Exception ex) {
+			fail(ex);
+		}
 	}
 }

@@ -19,9 +19,8 @@ public abstract class VMTask extends VSphereTask {
 	protected static final long DEFAULT_TIMEOUT =  2 * 60 * 1000;
 
 	private String ip;
-	private String mor;
+	private String vmId;
 	private String name;
-	
 	
 	/**
 	 * Set the IP address of the virtual machine
@@ -35,8 +34,8 @@ public abstract class VMTask extends VSphereTask {
 	 * Set the MOR value of the virtual machine
 	 * @param id Virtual machine MOR value
 	 */
-	public void setMor (String id) {
-		this.mor = id;
+	public void setVmid (String id) {
+		this.vmId = id;
 	}
 	
 	/**
@@ -49,8 +48,8 @@ public abstract class VMTask extends VSphereTask {
 	
 	protected String getVMDescription () {
 		StringBuilder s = new StringBuilder();
-		if (mor != null)
-			s.append("MOR=").append(mor).append(' ');
+		if (vmId != null)
+			s.append("MOR=").append(vmId).append(' ');
 		if (name != null)
 			s.append("Name=").append(name).append(' ');
 		if (ip != null)
@@ -66,16 +65,19 @@ public abstract class VMTask extends VSphereTask {
 		trace("Waiting for " + toString(vm) + " primary IP address ...");
 		String ip = null;
 		long start = System.currentTimeMillis();
-		while ((ip == null || ip.isEmpty()) && (System.currentTimeMillis() - start < timeout)) {
+		while ((ip == null || ip.isEmpty()) && 
+				(timeout == 0 || (System.currentTimeMillis() - start < timeout))) {
 			ip = vm.getSummary().getGuest().getIpAddress();
 			if (ip == null || ip.isEmpty()) {
-				Thread.sleep(2500);
+				Thread.sleep(500);
 			}
 		}
 		
 		if (ip == null || ip.isEmpty()) {
 			throw new BuildException("Timed out waiting for VM primary IP address");
 		}
+		
+		trace(toString(vm) + " assigned IP address " + ip);
 		
 		return ip;
 	}
@@ -100,15 +102,15 @@ public abstract class VMTask extends VSphereTask {
 	protected VirtualMachine findVM () throws BuildException {
 		
 		if ((ip == null || ip.isEmpty()) && 
-			(mor == null || mor.isEmpty()) && 
+			(vmId == null || vmId.isEmpty()) && 
 			(name == null || name.isEmpty())) {
 			
 			throw new BuildException("Must specify either the VM IP address, MOR ID, or name");
 		}
 
 		VirtualMachine vm = null;
-		if (mor != null && !mor.isEmpty())
-			vm = getVMFromId(mor);
+		if (vmId != null && !vmId.isEmpty())
+			vm = getVMFromId(vmId);
 		else if (name != null && !name.isEmpty())
 			vm = getVMFromName(name);
 		else

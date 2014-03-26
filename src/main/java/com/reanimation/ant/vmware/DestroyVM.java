@@ -11,7 +11,9 @@ public class DestroyVM extends VMTask {
 
 	@Override
 	public void execute () {
-		connect();
+		if (!connect())
+			return;
+		
 		try {
 			VirtualMachine vm = findVM();
 			stopVM(vm);
@@ -20,10 +22,8 @@ public class DestroyVM extends VMTask {
 			String status = task.waitForTask();
 			if (status != com.vmware.vim25.mo.Task.SUCCESS)
 				throw new BuildException(task.getTaskInfo().getError().getLocalizedMessage());
-		} catch (BuildException buildError) {
-			throw buildError;
 		} catch (Exception ex) {
-			throw new BuildException(ex);
+			fail(ex);
 		}
 	}
 

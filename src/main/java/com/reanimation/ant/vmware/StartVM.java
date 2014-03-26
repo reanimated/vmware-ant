@@ -24,7 +24,7 @@ public class StartVM extends VMTask {
 	 * power on.
 	 * @param s An Ant property name
 	 */
-	public void setIpProperty (String s) {this.ipProperty = s;}
+	public void setIpproperty (String s) {this.ipProperty = s;}
 	
 	/**
 	 * Set the timeout in milliseconds to wait for the
@@ -37,9 +37,12 @@ public class StartVM extends VMTask {
 	
 	@Override
 	public void execute () throws BuildException {
-		connect();
-		VirtualMachine vm = findVM();
+		boolean ok = connect();
+		if (!ok)
+			return;
+		
 		try {
+			VirtualMachine vm = findVM();
 			if (vm.getRuntime().getPowerState() != VirtualMachinePowerState.poweredOn) {
 				log("Starting " + toString(vm) + " ...");
 				com.vmware.vim25.mo.Task task = vm.powerOnVM_Task(null);
@@ -54,10 +57,8 @@ public class StartVM extends VMTask {
 				String ip = waitForIpAddress(vm, timeout);
 				getProject().setProperty(ipProperty, ip);
 			}
-		} catch (BuildException buildError) {
-			throw buildError;
 		} catch (Exception ex) {
-			throw new BuildException(ex);
+			fail(ex);
 		}
 	}
 }

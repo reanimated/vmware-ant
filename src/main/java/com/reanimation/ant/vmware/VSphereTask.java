@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.UnknownElement;
@@ -34,6 +35,7 @@ public class VSphereTask extends Task implements TaskContainer {
 	private InventoryNavigator rootNavigator;
 	private boolean verbose = true;
 	private List<Task> tasks = null;
+	private boolean failOnError = true;
 	
 	/**
 	 * Set the required vSphere host.
@@ -77,6 +79,15 @@ public class VSphereTask extends Task implements TaskContainer {
 	public void setVerbose (boolean verbose) {
 		this.verbose = verbose;
 	}
+	
+	/**
+	 * Set whether to fail the build if an error
+	 * occurs with the vSphere APIs or with a task.
+	 * @param failOnError Set to true to fail the build if there is any error
+	 */
+	public void setFailonerror (boolean failOnError) {
+		this.failOnError = failOnError;
+	}
 
 	
 	public boolean isVerbose () {
@@ -101,11 +112,20 @@ public class VSphereTask extends Task implements TaskContainer {
 		}
 		tasks.add(task);
 	}
-	
 
-	protected void connect () throws BuildException {
+	protected void fail (Exception ex) {
+		if (failOnError) {
+			throw (ex instanceof BuildException) ? 
+					(BuildException) ex : 
+					new BuildException(ex);
+		} else {
+			log(ex, Project.MSG_ERR);
+		}
+	}
+	
+	protected boolean connect () throws BuildException {
 		if (service != null)
-			return;
+			return true;
 		
 		if (host == null)
 			throw new BuildException("vSphere host is required");
@@ -118,8 +138,10 @@ public class VSphereTask extends Task implements TaskContainer {
 			service = new ServiceInstance(getVSphereURL(host), user, password, ignoreCert);
 			rootFolder = service.getRootFolder();
 			rootNavigator = new InventoryNavigator(rootFolder);
+			return true;
 		} catch (Exception ex) {
-			throw new BuildException(ex);
+			fail(ex);
+			return false;
 		}
 	}
 	
@@ -144,6 +166,8 @@ public class VSphereTask extends Task implements TaskContainer {
 					}
 					task.perform();
 				}
+			} catch (Exception ex) {
+				fail(ex);
 			} finally {
 				localProperties.exitScope();
 			}
@@ -153,6 +177,11 @@ public class VSphereTask extends Task implements TaskContainer {
 	
 	private void setConnection(ServiceInstance service, Folder rootFolder,
 			InventoryNavigator rootNavigator) {
+		if (host != null ||
+				user != null ||
+				password != null) {
+			throw new BuildException("Do NOT set host, user, or password when the task is nested inside a vSphere task!");
+		}
 		this.service = service;
 		this.rootFolder = rootFolder;
 		this.rootNavigator = rootNavigator;

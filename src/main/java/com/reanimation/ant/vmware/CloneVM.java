@@ -96,9 +96,11 @@ public class CloneVM extends VMTask {
 	@Override
 	public void execute() throws BuildException {
 		
-		connect();
-		VirtualMachine sourceVM = findVM();
+		if (!connect())
+			return;
+		
 		try {
+			VirtualMachine sourceVM = findVM();
 			if (targetName == null)
 				throw new BuildException("target name MUST be specified");
 			
@@ -157,10 +159,8 @@ public class CloneVM extends VMTask {
 				}
 			}
 			
-		} catch (BuildException ex) {
-			throw ex;
-		} catch (Exception ex2) {
-			throw new BuildException(ex2);
+		} catch (Exception ex) {
+			fail(ex);
 		}
 	}
 	

@@ -11,7 +11,7 @@ import com.vmware.vim25.mo.VirtualMachine;
  */
 public class FindVM extends VMTask  {
 	
-	private String morProperty;
+	private String vmIdProperty;
 	private String pathProperty;
 	private String nameProperty;
 	private String ipProperty;
@@ -21,8 +21,8 @@ public class FindVM extends VMTask  {
 	 * of the located virtual machine.
 	 * @param propertyName Ant property name
 	 */
-	public void setMorProperty (String propertyName) {
-		this.morProperty = propertyName;
+	public void setVmidproperty (String propertyName) {
+		this.vmIdProperty = propertyName;
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class FindVM extends VMTask  {
 	 * folder path of the located virtual machine.
 	 * @param propertyName Ant property name
 	 */
-	public void setPathProperty (String propertyName) {
+	public void setPathproperty (String propertyName) {
 		this.pathProperty = propertyName;
 	}
 
@@ -39,7 +39,7 @@ public class FindVM extends VMTask  {
 	 * name of the located virtual machine.
 	 * @param propertyName Ant property name
 	 */
-	public void setNameProperty (String propertyName) {
+	public void setNameproperty (String propertyName) {
 		this.nameProperty = propertyName;
 	}
 
@@ -48,39 +48,44 @@ public class FindVM extends VMTask  {
 	 * primary IP address of the located virtual machine.
 	 * @param propertyName Ant property name
 	 */
-	public void setIpProperty (String propertyName) {
+	public void setIpproperty (String propertyName) {
 		this.ipProperty = propertyName;
 	}
 
 	@Override
 	public void execute() throws BuildException {
-		connect();
-		VirtualMachine vm = findVM();
-		
-		if (morProperty != null) {
-			getProject().setProperty(morProperty, vm.getMOR().getVal());
-		}
+		if (!connect())
+			return;
+		try {
+			VirtualMachine vm = findVM();
 			
-		if (pathProperty != null) {
-			StringBuilder path = new StringBuilder();
-			path.append(vm.getName());
-			ManagedEntity parent = vm.getParent();
-			boolean done = false;
-			while (parent != null && !done) {
-				path.insert(0, parent.getName() + "/" );
-				if (parent.getMOR().getType().equals("Datacenter"))
-					done = true;
-				parent = parent.getParent();
+			if (vmIdProperty != null) {
+				getProject().setProperty(vmIdProperty, vm.getMOR().getVal());
 			}
-			getProject().setProperty(pathProperty, path.toString());
-		}
-			
-		if (nameProperty != null) {
-			getProject().setProperty(nameProperty, vm.getName());
-		}
-			
-		if (ipProperty != null) {
-			getProject().setProperty(ipProperty, vm.getSummary().getGuest().getIpAddress());
+				
+			if (pathProperty != null) {
+				StringBuilder path = new StringBuilder();
+				path.append(vm.getName());
+				ManagedEntity parent = vm.getParent();
+				boolean done = false;
+				while (parent != null && !done) {
+					path.insert(0, parent.getName() + "/" );
+					if (parent.getMOR().getType().equals("Datacenter"))
+						done = true;
+					parent = parent.getParent();
+				}
+				getProject().setProperty(pathProperty, path.toString());
+			}
+				
+			if (nameProperty != null) {
+				getProject().setProperty(nameProperty, vm.getName());
+			}
+				
+			if (ipProperty != null) {
+				getProject().setProperty(ipProperty, vm.getSummary().getGuest().getIpAddress());
+			}
+		} catch (Exception ex) {
+			fail(ex);
 		}
 	}
 }
